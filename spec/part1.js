@@ -462,7 +462,7 @@
         expect(memoInCallback).to.equal('memo');
         expect(itemInCallback).to.equal('item');
       });
-
+      
       it('should pass items of the array into the iterator from left to right', function() {
         var orderTraversed = [];
 
@@ -470,7 +470,8 @@
           // FILL_ME_IN
           // Add a line here that makes this test pass
           // for a working implementation of reduce
-          return memo;
+          
+          return orderTraversed.push(item);
         }, 10);
 
         expect(orderTraversed).to.eql([1, 2, 3, 4]);

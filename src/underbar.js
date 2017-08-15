@@ -138,7 +138,7 @@
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
     var results = [];
-    _.each(collection, function(x){
+    _.each(collection, function(x) {
       results.push(iterator(x));
     });
     return results;
@@ -183,22 +183,27 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
-  
-    if (Array.isArray(collection)) {
+  // 1. if the collection is not an array (ie an obj) push values to an empty array. This means both arrays and objects will now be treated as arrays.
+    
+    if (!Array.isArray(collection)) {
       var results = [];
       for (var key in collection) {
         results.push(collection[key]);
       }
       collection = results;    
     }
-    
-    if (arguments.length < 3) {
+ // 2. If there is no accumulator, set the collection[0] to be accum.
+    if (collection.length === 0) {
+      return accumulator;
+    } else if (arguments.length < 3) {
       accumulator = collection[0];
-      iterator()
+   // 3. Now recursively call the function itself (ie reduce!) BUT slicing the first element from the collection for each function call.   
+      return _.reduce(collection.slice(1), iterator, accumulator);
+    } else {
+   // 4. Now, if there is   
+      accumulator = iterator(accumulator, collection[0]);
+      return _.reduce(collection.slice(1), iterator, accumulator);
     }
-    
-    
-    
   };
 
   // Determine if the array or object contains a given value (using `===`).
@@ -216,6 +221,21 @@
 
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
+    
+    // 1. Reduce goes through every element of a collection.
+    
+    //Compare boolean value of item to memo, if true, continue, false - return false.
+    if (iterator === undefined) {
+      iterator = _.identity;
+    }
+    
+    return !!_.reduce(collection, function(allPassed, item) {
+      return (iterator(item) && allPassed);
+    }, true);
+    // 2. it immediately breaks if one item fails a truth test.
+    
+    // 3. if it gets to the end of the collection without any item failing a truth test, return true.
+    
     // TIP: Try re-using reduce() here.
   };
 
@@ -223,6 +243,26 @@
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    if (iterator === undefined) {
+      iterator = _.identity;
+    }
+    
+    return !!_.reduce(collection, function(onePassed, item) {
+      return (iterator(item) || onePassed);
+    }, false);
+    
+    // if (_.every(collection, iterator)) {
+    //   return true;
+    // } else {
+    //   for (var i = 0; i < collection.length; i++) {
+    //     if (!iterator(collection[i])) {
+    //       //keep iterating
+    //     } else {
+    //       return true;
+    //     }
+    //   }
+    // }  
+    
   };
 
 

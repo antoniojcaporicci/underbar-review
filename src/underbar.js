@@ -247,7 +247,7 @@
       iterator = _.identity;
     }
     
-    return !!_.reduce(collection, function(onePassed, item) {
+    return !! _.reduce(collection, function(onePassed, item) {
       return (iterator(item) || onePassed);
     }, false);
     
@@ -285,11 +285,25 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    for (var i = 1; i < arguments.length; i++) {
+      for (var key in arguments[i]) {
+        obj[key] = arguments[i][key];
+      }
+    } 
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    for (var i = 1; i < arguments.length; i++) {
+      for (var key in arguments[i]) {
+        if (!obj.hasOwnProperty(key)) {
+          obj[key] = arguments[i][key];
+        }
+      }
+    } 
+    return obj;
   };
 
 
@@ -333,6 +347,16 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+
+    var result = {};
+    
+    return function() {
+      var input = JSON.stringify(arguments);
+      if (!result.hasOwnProperty(input)) {
+        result[input] = func.apply(this, arguments);
+      }
+      return result[input];
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -342,6 +366,13 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    var arg1 = arguments[2];
+    var arg2 = arguments[3];
+    
+    setTimeout(function() { 
+      func(arg1, arg2);
+    }, wait);
+    
   };
 
 
